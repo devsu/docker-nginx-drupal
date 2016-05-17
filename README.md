@@ -70,9 +70,11 @@ The startup.sh script will add the environment variables with MYSQL_ to /etc/php
 
 1. Smaller image
 
-2. sendmail instead of msmtp
+2. sendmail instead of msmtp, in foreground 
 
 3. Removed /var/www/site/default/file volume for convenience
+
+4. php5-fpm in foreground with -D option
 
 ### License
 Released under the MIT License.
