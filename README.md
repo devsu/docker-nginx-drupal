@@ -1,6 +1,6 @@
 # Docker image with Nginx and PHP 5.5.9 optimized for Drupal 7
 This image is build using Ubuntu 14.04 with Nginx and PHP 5.5.9 and is optimized to run Drupal 7.
-It can run Drupal 6 but most likelly you'll have PHP errors depending on the modules you have installed. In that case is recommended to use the image iiiepe/nginx-drupal6 or iiiepe/apache-drupal6
+It can run Drupal 6 but most likely you'll have PHP errors depending on the modules you have installed. In that case is recommended to use the image iiiepe/nginx-drupal6 or iiiepe/apache-drupal6
 
 Includes:
 
@@ -23,27 +23,31 @@ Important:
 
     $ docker build -t yourname/nginx-drupal .
 
+## Pull
+
+    $ docker pull devsu/nginx-drupal7
 
 ## To run
+
 Nginx will look for files in /var/www so you need to map your application to that directory.
 
     $ docker run -d -p 8000:80 -v application:/var/www yourname/nginx-drupal
 
-If you want to link the container to a MySQL/MariaDB contaier do:
+If you want to link the container to a MySQL/MariaDB container do:
 
     $ docker run -d -p 8000:80 -v application:/var/www my_mysql_container:mysql yourname/nginx-drupal
 
 The startup.sh script will add the environment variables with MYSQL_ to /etc/php5/fpm/pool.d/env.conf so PHP-FPM detects them. If you need to use them you can do:
 <?php getenv("SOME_ENV_VARIABLE_THAT_HAS_MYSQL_IN_THE_NAME"); ?>
 
-## Fig
+## docker-compose.yml
 
     mysql:
       image: mysql
       expose:
         - "3306"
       environment:
-        MYSQL_ROOT_PASSWORD: 123
+        MYSQL_ROOT_PASSWORD: my-secret-pass
     web:
       image: iiiepe/nginx-drupal
       volumes:
@@ -54,10 +58,28 @@ The startup.sh script will add the environment variables with MYSQL_ to /etc/php
       links:
         - "mysql:mysql"
 
-## Running Drush
-With Fig this is actually easier and is the recommended way since if you're running Docker without fig, you'll have to link all containers before you run drush.
 
-    $ fig run --rm web drush
+## Recommended to be used behind a reverse-proxy like [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy)
+
+    $ docker run -d -v application:/var/www my_mysql_container:mysql devsu/nginx-drupal7
+
+    $ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
+    
+## Mailing
+
+*sendmail* usually requires an specific HOSTNAME, run like this:
+
+    $ docker run -d -h example.com -v application:/var/www my_mysql_container:mysql devsu/nginx-drupal7
+
+## Changes from base image [iiiepe/docker-nginx-drupal](https://github.com/iiiepe/docker-nginx-drupal)
+
+1. Slightly smaller image size
+
+2. sendmail instead of msmtp, in foreground 
+
+3. Removed /var/www/site/default/file volume for convenience
+
+4. php5-fpm in foreground with -D option
 
 ### License
 Released under the MIT License.
