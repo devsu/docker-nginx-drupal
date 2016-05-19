@@ -54,9 +54,7 @@ RUN usermod -u 1000 www-data
 RUN usermod -a -G users www-data
 RUN chown -R www-data:www-data /var/www
 
-EXPOSE 80
 WORKDIR /var/www
-CMD ["/usr/bin/supervisord", "-n"]
 
 # Startup script
 # This startup script wll configure nginx
@@ -100,3 +98,8 @@ ADD ./config/nginx/cron_allowed_hosts.conf /etc/nginx/cron_allowed_hosts.conf
 ADD ./config/nginx/php_fpm_status_allowed_hosts.conf /etc/nginx/php_fpm_status_allowed_hosts.conf
 ADD ./config/nginx/default /etc/nginx/sites-enabled/default
 
+# Private expose
+EXPOSE 80
+
+# Run startup script
+CMD ["/bin/bash", "/opt/startup.sh"]
