@@ -37,3 +37,12 @@ echo "ff02::2	ip6-allrouters" >> /etc/hosts
 
 # Runnning supervisor
 /usr/bin/supervisord -n
+
+# Setting up drush cron to run according CRON_SCHEDULE or 15 min by default
+
+if [[ -z $CRON_SCHEDULE ]]; then
+	CRON_SCHEDULE="*/15 * * * *"
+else
+	echo "CRON setup to user input"
+fi
+crontab -l | { cat; echo "$CRON_SCHEDULE cd /var/www && /usr/local/bin/drush cron > /var/log/supervisor/cron.log"; } | crontab -u www-data -

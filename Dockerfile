@@ -61,9 +61,6 @@ WORKDIR /var/www
 ADD ./startup.sh /opt/startup.sh
 RUN chmod +x /opt/startup.sh
 
-ADD ./cron.sh /opt/cron.sh
-RUN chmod +x /opt/cron.sh
-
 RUN mkdir -p /var/cache/nginx/microcache
 
 # Avoid sendmail starting as a service
