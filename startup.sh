@@ -39,10 +39,20 @@ echo "ff02::2	ip6-allrouters" >> /etc/hosts
 /usr/bin/supervisord -n
 
 # Setting up drush cron to run according CRON_SCHEDULE or 15 min by default
-
 if [[ -z $CRON_SCHEDULE ]]; then
-	CRON_SCHEDULE="*/15 * * * *"
+        CRON_SCHEDULE="*/15 * * * *"
 else
-	echo "CRON setup to user input"
+        echo "CRON setup to user input"
 fi
-crontab -l | { cat; echo "$CRON_SCHEDULE cd /var/www && /usr/local/bin/drush cron > /var/log/supervisor/cron.log"; } | crontab -u www-data -
+
+# Checking if the cron is already set up
+# Cron job written according http://www.drush.org/en/master/cron/
+CRON_JOB="www-data /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron"
+CHECK=$(cat /etc/crontab | grep -o "$CRON_JOB" )
+
+if [[ -z $CHECK ]]; then
+	echo "$CRON_SCHEDULE www-data /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron" >> /etc/crontab
+	echo "CRON_JOB set in /etc/crontab" >> /var/log/supervisor/cron.log
+else
+	echo "CRON_JOB already created, doing nothing..." >> /var/log/supervisor/cron.log
+fi
