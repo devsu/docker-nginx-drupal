@@ -56,3 +56,62 @@ if [[ -z $CHECK ]]; then
 else
 	echo "CRON_JOB already created, doing nothing..." >> /var/log/supervisor/cron.log
 fi
+
+# Adding .htaccess to sites/default/files/ and /tmp according https://www.drupal.org/SA-CORE-2013-003
+
+FILES_HTACCESS="# Turn off all options we don't need.
+Options None
+Options +FollowSymLinks
+
+# Set the catch-all handler to prevent scripts from being executed.
+SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006
+<Files *>
+  # Override the handler again if we're run later in the evaluation list.
+  SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003
+</Files>
+
+# If we know how to do it safely, disable the PHP engine entirely.
+<IfModule mod_php5.c>
+  php_flag engine off
+</IfModule>"
+
+TMP_HTACCESS="# Turn off all options we don't need.
+Options None
+Options +FollowSymLinks
+
+# Set the catch-all handler to prevent scripts from being executed.
+SetHandler Drupal_Security_Do_Not_Remove_See_SA_2006_006
+<Files *>
+  # Override the handler again if we're run later in the evaluation list.
+  SetHandler Drupal_Security_Do_Not_Remove_See_SA_2013_003
+</Files>
+
+# If we know how to do it safely, disable the PHP engine entirely.
+<IfModule mod_php5.c>
+  php_flag engine off
+</IfModule>
+Deny from all"
+
+# Checking files/.htaccess
+if [[ -e /var/www/sites/default/files/.htaccess ]]; then
+	if [[ "$FILES_HTACCESS" = $(cat htaccessfiles.txt) ]]; then
+		echo "File already exists"
+	else
+		echo "Files different"
+		echo "$FILES_HTACCESS" > /var/www/sites/default/files/.htaccess
+	fi
+else
+	echo "$FILES_HTACCESS" > /var/www/sites/default/files/.htaccess
+fi
+
+# Checking /tmp/.htaccess
+if [[ -e /tmp/.htaccess ]]; then
+	if [[ "$TMP_HTACCESS" = $(cat htaccessfiles.txt) ]]; then
+		echo "File already exists"
+	else
+		echo "Files different"
+		echo "$TMP_HTACCESS" > /tmp/.htaccess
+	fi
+else
+	echo "$TMP_HTACCESS" > /tmp/.htaccess
+fi
