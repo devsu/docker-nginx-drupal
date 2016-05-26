@@ -41,9 +41,6 @@ echo "ff00::0	ip6-mcastprefix" >> /etc/hosts
 echo "ff02::1	ip6-allnodes" >> /etc/hosts
 echo "ff02::2	ip6-allrouters" >> /etc/hosts
 
-# Runnning supervisor
-/usr/bin/supervisord -n
-
 # Setting up drush cron to run according CRON_SCHEDULE or 15 min by default
 if [[ -z $CRON_SCHEDULE ]]; then
         CRON_SCHEDULE="*/15 * * * *"
@@ -111,3 +108,6 @@ if [[ -e /tmp/.htaccess ]]; then
 else
 	echo "$TMP_HTACCESS" > /tmp/.htaccess
 fi
+
+# Runnning supervisor
+/usr/bin/supervisord -n
