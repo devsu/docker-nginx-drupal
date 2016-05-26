@@ -100,24 +100,14 @@ Deny from all"
 
 # Checking files/.htaccess
 if [[ -e /var/www/sites/default/files/.htaccess ]]; then
-	if [[ "$FILES_HTACCESS" = $(cat htaccessfiles.txt) ]]; then
-		echo "File already exists"
-	else
-		echo "Files different"
-		echo "$FILES_HTACCESS" > /var/www/sites/default/files/.htaccess
-	fi
+	echo "File already exists"
 else
 	echo "$FILES_HTACCESS" > /var/www/sites/default/files/.htaccess
 fi
 
 # Checking /tmp/.htaccess
 if [[ -e /tmp/.htaccess ]]; then
-	if [[ "$TMP_HTACCESS" = $(cat htaccessfiles.txt) ]]; then
-		echo "File already exists"
-	else
-		echo "Files different"
-		echo "$TMP_HTACCESS" > /tmp/.htaccess
-	fi
+	echo "File already exists"
 else
 	echo "$TMP_HTACCESS" > /tmp/.htaccess
 fi
