@@ -2,6 +2,11 @@
 
 ENV_CONF=/etc/php5/fpm/pool.d/env.conf
 
+ENV_CRON=/etc/cron.d/drupal
+
+# Force deletion and creation of new file
+rm -f $ENV_CRON
+
 echo "Configuring Nginx and PHP5-FPM with environment variables"
 
 # Update php5-fpm with access to Docker environment variables
@@ -10,6 +15,7 @@ for var in $(env | awk -F= '{print $1}')
 do
 	echo "Adding variable {$var}"
 	echo "env[${var}] = ${!var}" >> $ENV_CONF
+        echo "${var}=${!var}" >> $ENV_CRON
 done
 
 # We need to configure the /etc/hosts file so sendmail works properly
@@ -47,14 +53,14 @@ fi
 
 # Checking if the cron is already set up
 # Cron job written according http://www.drush.org/en/master/cron/
-CRON_JOB="www-data /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron"
+CRON_JOB="root /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron"
 CHECK=$(cat /etc/crontab | grep -o "$CRON_JOB" )
 
 if [[ -z $CHECK ]]; then
-	echo "$CRON_SCHEDULE www-data /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron" >> /etc/crontab
-	echo "CRON_JOB set in /etc/crontab" >> /var/log/supervisor/cron.log
+	echo "$CRON_SCHEDULE $CRON_JOB" >> /etc/cron.d/drupal
+	echo "$(date "+%Y-%m-%d %H:%M:%S") CRON_JOB set in /etc/crontab" >> /var/log/supervisor/cron.log
 else
-	echo "CRON_JOB already created, doing nothing..." >> /var/log/supervisor/cron.log
+	echo "$(date "+%Y-%m-%d %H:%M:%S") CRON_JOB already created, doing nothing..." >> /var/log/supervisor/cron.log
 fi
 
 # Adding .htaccess to sites/default/files/ and /tmp according https://www.drupal.org/SA-CORE-2013-003
