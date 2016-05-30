@@ -70,6 +70,14 @@ The startup.sh script will add the environment variables with MYSQL_ to /etc/php
 *sendmail* usually requires an specific HOSTNAME, run like this:
 
     $ docker run -d -h example.com -v application:/var/www my_mysql_container:mysql devsu/nginx-drupal7
+    
+## Drush Cron Support
+
+To specify *cron* schedule you can set the variable `CRON_SCHEDULE` to the desired settings. Like this:
+
+    $ docker run -d -e CRON_SCHEDULE="10 * * * *" -v application:/var/www my_mysql_container:mysql devsu/nginx-drupal7
+    
+The default value is "*/15 * * * *" (Every fifteen minutes)
 
 ## Changes from base image [iiiepe/docker-nginx-drupal](https://github.com/iiiepe/docker-nginx-drupal)
 
