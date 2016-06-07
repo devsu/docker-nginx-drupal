@@ -43,10 +43,11 @@ RUN php5enmod mcrypt
 RUN /usr/bin/curl -sS https://getcomposer.org/installer | /usr/bin/php
 RUN /bin/mv composer.phar /usr/local/bin/composer
 
-# Install Composer and Drush
+# Install Composer and Drush 6.7
+RUN /usr/bin/curl -sS https://getcomposer.org/installer | /usr/bin/php
+RUN /bin/mv composer.phar /usr/local/bin/composer
 RUN /usr/local/bin/composer self-update
-RUN /usr/local/bin/composer global require drush/drush:6.*
-RUN ln -s /root/.composer/vendor/drush/drush/drush /usr/local/bin/drush
+RUN mkdir --parents /opt/drush-6.7 && cd /opt/drush-6.7 && composer init --require=drush/drush:6.* -n && /usr/local/bin/composer config bin-dir /usr/local/bin && /usr/local/bin/composer install
 
 # Prepare directory
 RUN mkdir /var/www
