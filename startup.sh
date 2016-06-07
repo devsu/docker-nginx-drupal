@@ -50,12 +50,12 @@ fi
 
 # Checking if the cron is already set up
 # Cron job written according http://www.drush.org/en/master/cron/
-CRON_JOB="root /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron"
-CHECK=$(cat /etc/crontab | grep -o "$CRON_JOB" )
+CRON_JOB="www-data /usr/bin/env PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin COLUMNS=72 /usr/local/bin/drush --root=/var/www cron"
+CHECK=$(cat $ENV_CRON | grep -o "$CRON_JOB" )
 
 if [[ -z $CHECK ]]; then
-	echo "$CRON_SCHEDULE $CRON_JOB" >> /etc/cron.d/drupal
-	echo "$(date "+%Y-%m-%d %H:%M:%S") CRON_JOB set in /etc/crontab" >> /var/log/supervisor/cron.log
+	echo "$CRON_SCHEDULE $CRON_JOB" >> $ENV_CRON
+	echo "$(date "+%Y-%m-%d %H:%M:%S") CRON_JOB set in $ENV_CRON" >> /var/log/supervisor/cron.log
 else
 	echo "$(date "+%Y-%m-%d %H:%M:%S") CRON_JOB already created, doing nothing..." >> /var/log/supervisor/cron.log
 fi
